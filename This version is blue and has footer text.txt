@@ -1,0 +1,327 @@
+
+
+This version is blue and has footer text replace the copy in the Form1.cs only and then dotnet run in the terminal window to compile.
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+using System;
+using System.IO;
+using System.Diagnostics;
+using System.Windows.Forms;
+using System.Management;
+using System.Net;
+using System.Net.NetworkInformation;
+
+namespace ServerInfoApp
+{
+    public partial class Form1 : Form
+    {
+        private Label titleLabel;
+        private Label footerLabel;
+        private Button infoButton;
+        private Button diskInfoButton;
+        private Button networkInfoButton;
+        private Button printButton;
+        private Button adminButton;
+        private TextBox infoTextBox;
+        private TextBox diskInfoTextBox;
+        private TextBox networkInfoTextBox;
+
+        public Form1()
+        {
+            InitializeComponent();
+
+            this.Text = "SSFCU DR Documentation Server Info";
+            this.StartPosition = FormStartPosition.CenterScreen;
+            this.BackColor = System.Drawing.Color.FromArgb(10, 25, 74); // dark navy blue
+
+            titleLabel = new Label();
+            titleLabel.Text = "SSFCU DR Documentation Server Info";
+            titleLabel.Font = new System.Drawing.Font(titleLabel.Font.FontFamily, 18, System.Drawing.FontStyle.Bold);
+            titleLabel.ForeColor = System.Drawing.Color.White;
+            titleLabel.AutoSize = true;
+            titleLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            titleLabel.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            titleLabel.Location = new System.Drawing.Point((this.ClientSize.Width - titleLabel.Width) / 2, 10);
+
+            // Updated Footer Label
+            footerLabel = new Label();
+            footerLabel.Text = "SSFCU DR Server Info App | Design by Noe Tovar-MBA 2025";
+            footerLabel.Font = new System.Drawing.Font("Segoe UI", 9, System.Drawing.FontStyle.Italic);
+            footerLabel.ForeColor = System.Drawing.Color.White;
+            footerLabel.AutoSize = true;
+            footerLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            footerLabel.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            footerLabel.Location = new System.Drawing.Point((this.ClientSize.Width - 400) / 2, this.ClientSize.Height - 30);
+
+            infoButton = CreateStyledButton("Get Server Information", 50, 50);
+            infoButton.Click += new EventHandler(InfoButton_Click);
+
+            diskInfoButton = CreateStyledButton("Get Disk Information", 50, 150);
+            diskInfoButton.Click += new EventHandler(DiskInfoButton_Click);
+
+            networkInfoButton = CreateStyledButton("Get Network Information", 50, 250);
+            networkInfoButton.Click += new EventHandler(NetworkInfoButton_Click);
+
+            infoTextBox = new TextBox();
+            infoTextBox.Multiline = true;
+            infoTextBox.ScrollBars = ScrollBars.Vertical;
+            infoTextBox.Size = new System.Drawing.Size(400, 100);
+            infoTextBox.Location = new System.Drawing.Point(300, 50);
+            infoTextBox.Anchor = AnchorStyles.Top;
+
+            diskInfoTextBox = new TextBox();
+            diskInfoTextBox.Multiline = true;
+            diskInfoTextBox.ScrollBars = ScrollBars.Vertical;
+            diskInfoTextBox.Size = new System.Drawing.Size(400, 100);
+            diskInfoTextBox.Location = new System.Drawing.Point(300, 150);
+            diskInfoTextBox.Anchor = AnchorStyles.Top;
+
+            networkInfoTextBox = new TextBox();
+            networkInfoTextBox.Multiline = true;
+            networkInfoTextBox.ScrollBars = ScrollBars.Vertical;
+            networkInfoTextBox.Size = new System.Drawing.Size(400, 100);
+            networkInfoTextBox.Location = new System.Drawing.Point(300, 250);
+            networkInfoTextBox.Anchor = AnchorStyles.Top;
+
+            printButton = CreateStyledButton("Print", 300, 370);
+            printButton.Size = new System.Drawing.Size(100, 40);
+            printButton.Anchor = AnchorStyles.Bottom;
+            printButton.Click += new EventHandler(PrintButton_Click);
+
+            adminButton = CreateStyledButton("Admin", 500, 370);
+            adminButton.Size = new System.Drawing.Size(100, 40);
+            adminButton.Anchor = AnchorStyles.Bottom;
+            adminButton.Click += new EventHandler(AdminButton_Click);
+
+            this.Controls.Add(titleLabel);
+            this.Controls.Add(infoButton);
+            this.Controls.Add(diskInfoButton);
+            this.Controls.Add(networkInfoButton);
+            this.Controls.Add(infoTextBox);
+            this.Controls.Add(diskInfoTextBox);
+            this.Controls.Add(networkInfoTextBox);
+            this.Controls.Add(printButton);
+            this.Controls.Add(adminButton);
+            this.Controls.Add(footerLabel);
+
+            this.Load += new EventHandler(Form1_Load);
+            this.Resize += new EventHandler(Form1_Resize);
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            CenterTitleLabel();
+            CenterFooterLabel();
+        }
+
+        private void Form1_Resize(object sender, EventArgs e)
+        {
+            CenterTitleLabel();
+            CenterFooterLabel();
+        }
+
+        private void CenterTitleLabel()
+        {
+            titleLabel.Left = (this.ClientSize.Width - titleLabel.Width) / 2;
+        }
+
+        private void CenterFooterLabel()
+        {
+            footerLabel.Left = (this.ClientSize.Width - footerLabel.Width) / 2;
+            footerLabel.Top = this.ClientSize.Height - footerLabel.Height - 10;
+        }
+
+        private Button CreateStyledButton(string text, int x, int y)
+        {
+            Button button = new Button();
+            button.Text = text;
+            button.Font = new System.Drawing.Font(button.Font, System.Drawing.FontStyle.Bold);
+            button.Size = new System.Drawing.Size(200, 50);
+            button.Location = new System.Drawing.Point(x, y);
+            button.FlatStyle = FlatStyle.Flat;
+            button.FlatAppearance.BorderColor = System.Drawing.Color.Black;
+            button.FlatAppearance.BorderSize = 2;
+            button.BackColor = System.Drawing.Color.MintCream;
+            return button;
+        }
+
+        private void InfoButton_Click(object sender, EventArgs e)
+        {
+            string cpuInfo = GetCPUInfo();
+            string ramInfo = GetRAMInfo();
+            string osInfo = GetOSInfo();
+            string hostName = Environment.MachineName;
+            string userName = Environment.UserName;
+            string domainName = Environment.UserDomainName;
+            string productKey = GetWindowsProductKey();
+
+            infoTextBox.Text = $"Host Name: {hostName}\n\n" +
+                               $"User Name: {userName}\n\n" +
+                               $"Domain Name: {domainName}\n\n" +
+                               $"CPU:\n{cpuInfo}\n\n" +
+                               $"RAM:\n{ramInfo}\n\n" +
+                               $"Operating System:\n{osInfo}\n\n" +
+                               $"Product Key: {productKey}";
+        }
+
+        private void DiskInfoButton_Click(object sender, EventArgs e)
+        {
+            diskInfoTextBox.Text = GetDiskInfo();
+        }
+
+        private void NetworkInfoButton_Click(object sender, EventArgs e)
+        {
+            networkInfoTextBox.Text = GetNetworkInfo();
+        }
+
+        private void PrintButton_Click(object sender, EventArgs e)
+        {
+            string output = "Server Information:\n" + infoTextBox.Text +
+                            "\n\nDisk Information:\n" + diskInfoTextBox.Text +
+                            "\n\nNetwork Information:\n" + networkInfoTextBox.Text +
+                            "\n\nFor more information about this application, contact Noe Tovar at https://www.linkedin.com/in/noe-tovar-mba";
+
+            File.WriteAllText("ServerInformation.txt", output);
+            MessageBox.Show("Information saved to ServerInformation.txt");
+        }
+
+        private void AdminButton_Click(object sender, EventArgs e)
+        {
+            Process.Start(new ProcessStartInfo("https://drive.google.com/drive/folders/15LfyISKWOLvk6MKC2RYTjs2MeNYAng2s?usp=sharing")
+            {
+                UseShellExecute = true
+            });
+        }
+
+        private string GetCPUInfo()
+        {
+            string cpuBaseSpeed = "";
+            string cpuCores = "";
+            string logicalProcessors = "";
+
+            ManagementObjectSearcher searcher = new ManagementObjectSearcher("select * from Win32_Processor");
+            foreach (ManagementObject obj in searcher.Get())
+            {
+                cpuBaseSpeed = $"{obj["MaxClockSpeed"]} MHz";
+                cpuCores = obj["NumberOfCores"].ToString();
+                logicalProcessors = obj["NumberOfLogicalProcessors"].ToString();
+            }
+
+            return $"Base Speed: {cpuBaseSpeed}\nCores: {cpuCores}\nLogical Processors: {logicalProcessors}";
+        }
+
+        private string GetRAMInfo()
+        {
+            string ram = "";
+            ManagementObjectSearcher searcher = new ManagementObjectSearcher("select * from Win32_ComputerSystem");
+            foreach (ManagementObject obj in searcher.Get())
+            {
+                double totalRam = Math.Round(Convert.ToDouble(obj["TotalPhysicalMemory"]) / (1024 * 1024 * 1024), 2);
+                ram = $"{totalRam} GB";
+            }
+
+            return ram;
+        }
+
+        private string GetOSInfo()
+        {
+            string osName = "";
+            string osVersion = "";
+            ManagementObjectSearcher searcher = new ManagementObjectSearcher("select * from Win32_OperatingSystem");
+            foreach (ManagementObject obj in searcher.Get())
+            {
+                osName = obj["Caption"].ToString();
+                osVersion = obj["Version"].ToString();
+            }
+
+            return $"{osName} (Version: {osVersion})";
+        }
+
+        private string GetDiskInfo()
+        {
+            string diskInfo = "";
+            ManagementObjectSearcher searcher = new ManagementObjectSearcher("select * from Win32_LogicalDisk");
+            foreach (ManagementObject obj in searcher.Get())
+            {
+                string volumeName = obj["VolumeName"]?.ToString() ?? "Unnamed Volume";
+                string volumeType = obj["Description"].ToString();
+                double totalSize = Math.Round(Convert.ToDouble(obj["Size"]) / (1024 * 1024 * 1024), 2);
+                double freeSpace = Math.Round(Convert.ToDouble(obj["FreeSpace"]) / (1024 * 1024 * 1024), 2);
+                double percentFree = Math.Round((freeSpace / totalSize) * 100, 2);
+
+                diskInfo += $"Volume: {volumeName}\n" +
+                            $"Type: {volumeType}\n" +
+                            $"Total Size: {totalSize} GB\n" +
+                            $"Free Space: {freeSpace} GB\n" +
+                            $"Percent Free: {percentFree}%\n\n";
+            }
+
+            return diskInfo.TrimEnd('\n');
+        }
+
+        private string GetNetworkInfo()
+        {
+            string ipAddress = "";
+            string subnetMask = "";
+            string gateway = "";
+            string dnsServers = "";
+            string uuid = "";
+
+            foreach (NetworkInterface ni in NetworkInterface.GetAllNetworkInterfaces())
+            {
+                if (ni.OperationalStatus == OperationalStatus.Up)
+                {
+                    foreach (UnicastIPAddressInformation ip in ni.GetIPProperties().UnicastAddresses)
+                    {
+                        if (ip.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+                        {
+                            ipAddress = ip.Address.ToString();
+                            subnetMask = ip.IPv4Mask.ToString();
+                            break;
+                        }
+                    }
+
+                    foreach (GatewayIPAddressInformation gatewayAddr in ni.GetIPProperties().GatewayAddresses)
+                    {
+                        gateway = gatewayAddr.Address.ToString();
+                    }
+
+                    foreach (IPAddress dns in ni.GetIPProperties().DnsAddresses)
+                    {
+                        if (dns.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+                        {
+                            dnsServers += $"{dns}\n";
+                        }
+                    }
+
+                    uuid = ni.Id;
+                    break;
+                }
+            }
+
+            return $"IP Address: {ipAddress}\n" +
+                   $"Subnet Mask: {subnetMask}\n" +
+                   $"Gateway: {gateway}\n" +
+                   $"DNS Servers:\n{dnsServers.TrimEnd('\n')}\n" +
+                   $"UUID: {uuid}";
+        }
+
+        private string GetWindowsProductKey()
+        {
+            try
+            {
+                ManagementObjectSearcher searcher = new ManagementObjectSearcher("select * from SoftwareLicensingService");
+                foreach (ManagementObject obj in searcher.Get())
+                {
+                    return obj["OA3xOriginalProductKey"]?.ToString() ?? "Product Key not found";
+                }
+                return "Product Key not found";
+            }
+            catch (Exception ex)
+            {
+                return $"Error retrieving Product Key: {ex.Message}";
+            }
+        }
+    }
+}
