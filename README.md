@@ -9,7 +9,7 @@ SSFCU-DRinfo-
 
 | **Feature**                   | **Description**                                                                       |
 | ----------------------------- | ------------------------------------------------------------------------------------- |
-| **🏠 Complete Privacy**       | Self-hosted on your infrastructure with zero tracking or data collection              |
+| **🏠 Complete Privacy**       | program will allow you to enter the source or origin folder of your choice            |
 | **📝 Smart Task Creation**    | Natural language parsing ("tomorrow at 2pm") with unlimited subtasks and rich details |
 | **🔄 Recurring Tasks**        | Daily, weekly, monthly, or custom patterns with automatic scheduling                  |
 | **📊 Project Organization**   | Group tasks by projects with sections, color-coded labels, and multiple views         |
