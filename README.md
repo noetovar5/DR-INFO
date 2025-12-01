@@ -1,10 +1,7 @@
 <div align="center">
 
 SSFCU-DRinfo-
-<p align="center">
-  <a href="https://skillicons.dev">
-    <img src="https://skillicons.dev/icons?i=js,html,css,git,dotnet,vscode,powershell,cs,git&perline=12" />
-  </a>
+
 </p>
 <img width="2100" height="620" alt="tasktrove-banner" src="https://github.com/noetovar5/portfolio/blob/main/Data%20back-up%20and%20Distaster%20recovery.webp?raw=true" />
 <br />
